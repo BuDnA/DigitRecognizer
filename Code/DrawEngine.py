@@ -8,19 +8,6 @@
 
 from PyQt4 import QtCore, QtGui
 
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    def _fromUtf8(s):
-        return s
-
-try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
-except AttributeError:
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
 
 class ScribbleArea(QtGui.QWidget):
     """
@@ -37,21 +24,6 @@ class ScribbleArea(QtGui.QWidget):
         self.image = QtGui.QImage()
         self.lastPoint = QtCore.QPoint()
 
-    def openImage(self, fileName):
-        loadedImage = QtGui.QImage()
-        if not loadedImage.load(fileName):
-            return False
-
-        w = loadedImage.width()
-        h = loadedImage.height()
-        self.mainWindow.resize(w, h)
-
-#       newSize = loadedImage.size().expandedTo(self.size())
-#       self.resizeImage(loadedImage, newSize)
-        self.image = loadedImage
-        self.modified = False
-        self.update()
-        return True
 
     def saveImage(self, fileName, fileFormat):
         visibleImage = self.image
@@ -75,11 +47,6 @@ class ScribbleArea(QtGui.QWidget):
         self.update()
 
     def mousePressEvent(self, event):
-#       print "self.image.width() = %d" % self.image.width()
-#       print "self.image.height() = %d" % self.image.height()
-#       print "self.image.size() = %s" % self.image.size()
-#       print "self.size() = %s" % self.size()
-#       print "event.pos() = %s" % event.pos()
         if event.button() == QtCore.Qt.LeftButton:
             self.lastPoint = event.pos()
             self.scribbling = True
@@ -98,20 +65,7 @@ class ScribbleArea(QtGui.QWidget):
         painter.drawImage(event.rect(), self.image)
 
     def resizeEvent(self, event):
-#       print "resize event"
-#       print "event = %s" % event
-#       print "event.oldSize() = %s" % event.oldSize()
-#       print "event.size() = %s" % event.size()
-
         self.resizeImage(self.image, event.size())
-
-#       if self.width() > self.image.width() or self.height() > self.image.height():
-#           newWidth = max(self.width() + 128, self.image.width())
-#           newHeight = max(self.height() + 128, self.image.height())
-#           print "newWidth = %d, newHeight = %d" % (newWidth, newHeight)
-#           self.resizeImage(self.image, QtCore.QSize(newWidth, newHeight))
-#           self.update()
-
         super(ScribbleArea, self).resizeEvent(event)
 
     def drawLineTo(self, endPoint):
@@ -121,8 +75,6 @@ class ScribbleArea(QtGui.QWidget):
         painter.drawLine(self.lastPoint, endPoint)
         self.modified = True
 
-        # rad = self.myPenWidth / 2 + 2
-        # self.update(QtCore.QRect(self.lastPoint, endPoint).normalized().adjusted(-rad, -rad, +rad, +rad))
         self.update()
         self.lastPoint = QtCore.QPoint(endPoint)
 
@@ -130,10 +82,7 @@ class ScribbleArea(QtGui.QWidget):
         if image.size() == newSize:
             return
 
-#       print "image.size() = %s" % repr(image.size())
-#       print "newSize = %s" % newSize
-
-# this resizes the canvas without resampling the image
+        # this resizes the canvas without resampling the image
         newImage = QtGui.QImage(newSize, QtGui.QImage.Format_RGB32)
         newImage.fill(QtGui.qRgb(255, 255, 255))
         painter = QtGui.QPainter(newImage)
@@ -206,7 +155,6 @@ class Scribble(QtGui.QWidget):
     def saveImage(self, fileName, fileFormat):
         visibleImage = self.scribbleArea.image
         #ScribbleArea.resizeImage(visibleImage, self.size())
-        from PyQt4.QtCore import *
         import numpy as np
         #visibleImage = QtGui.QImage(visibleImage.scaled(28,28))
         #= QtGui.QPixmap.fromImage(visibleImage)
