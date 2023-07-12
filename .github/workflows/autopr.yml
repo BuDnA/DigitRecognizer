@@ -37,7 +37,7 @@ jobs:
         ref: main
         fetch-depth: 1
     - name: AutoPR
-      uses: docker://ghcr.io/irgolic/autopr:latest
+      uses: BuDnA/AutoPR@main
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       with:
